@@ -1,0 +1,127 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hybe Shop</title>
+  <link rel="stylesheet" href="./css/style.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+  <nav class="navbar sticky-top navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+    <div class="container-fluid">
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarText">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="login.html">Log In</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="cssconcepts.html">Sign Up</a>
+          </li>
+        </ul>
+      </div>
+      <a class="nav-item position-relative" href="cart.html">
+        <i class="fa fa-shopping-cart" style="font-size:36px;color:#fff;"></i>
+        <span class="badge"></span>
+      </a>
+    </div>
+  </nav>
+  <div class="container mt-5">
+    <div class="card p-3">
+        <div class="card-header">
+            <h2>Your Shopping Cart</h2>
+        </div>
+        <ul class="list-group list-group-flush" id="cart-items">
+            <!-- Cart items will be dynamically added here -->
+            <li class="list-group-item">
+            </li>
+        </ul>
+        <div class="card-footer">
+          <p>Total:</p>
+          <h3>$<span id="total">0.00</span></h3>
+        </div>
+        <button type="button" name="buttonConfirm" class="btn btn-primary">Confirm Order</button>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.1/dist/umd/popper.min.js"></script>
+  <script src = "./js/app.js"></script>
+  <script src = "./js/script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Retrieve cart data from local storage
+      const cartData = JSON.parse(localStorage.getItem('cart')) || [];
+
+      // Display cart data on the cart page
+      const cartItems = document.getElementById('cart-items');
+      const totalSpan = document.getElementById('total');
+      let total = calculateTotal();
+
+      function calculateTotal() {
+        // Calculate the total based on the current items in the cart
+        return cartData.reduce((acc, item) => acc + item.price * item.quantity, 0);
+      }
+
+      function removeItemFromCart(index) {
+        // Subtract the removed item's total from the overall total
+        total -= cartData[index].price * cartData[index].quantity;
+
+        cartData.splice(index, 1);
+        localStorage.setItem('cart', JSON.stringify(cartData));
+        updateCartDisplay();
+      }
+
+      function updateCartDisplay() {
+        // Clear the existing items
+        cartItems.innerHTML = "";
+
+        // Display the updated cart items
+        cartData.forEach((item, index) => {
+          const cartItem = document.createElement('li');
+          cartItem.className = 'list-group-item';
+          cartItem.innerHTML = `
+            <div class="d-flex align-items-center justify-content-between">
+              <div class="d-flex">
+                <img src="${item.images}" alt="${item.name}" class="cartImage"/>
+                <div>
+                  <p>${item.name}</p>
+                  <p>Quantity: ${item.quantity}</p>
+                </div>
+              </div>
+              <button style="font-size:26px;cursor:pointer;background:none;border:none;" class="removeLocal" data-index="${index}"><i class="fa fa-trash" aria-hidden="true"></i></button>
+            </div>
+            <span>$${(item.price * item.quantity).toFixed(2)}</span>
+          `;
+          cartItems.appendChild(cartItem);
+        });
+
+        // Update the total based on the current items in the cart
+        total = calculateTotal();
+        totalSpan.textContent = total.toFixed(2);
+
+        // Add event listeners to the remove buttons
+        const removeButtons = document.querySelectorAll('.removeLocal');
+        removeButtons.forEach(button => {
+          button.addEventListener('click', function () {
+            const indexToRemove = this.getAttribute('data-index');
+            removeItemFromCart(indexToRemove);
+          });
+        });
+      }
+
+      // Initial cart display
+      updateCartDisplay();
+    });
+  </script>
+ </body>
+</html>
